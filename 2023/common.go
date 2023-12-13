@@ -6,12 +6,58 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 func check(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func uintegers(line string) []int {
+	rNum := regexp.MustCompile("[0-9]+")
+	stringResult := rNum.FindAllString(line, -1)
+	result := make([]int, len(stringResult))
+	for i := range stringResult {
+		v, err := strconv.Atoi(stringResult[i])
+		check(err)
+		result[i] = v
+	}
+	return result
+}
+
+func integers(line string) []int {
+	rNum := regexp.MustCompile("-?[0-9]+")
+	stringResult := rNum.FindAllString(line, -1)
+	result := make([]int, len(stringResult))
+	for i := range stringResult {
+		v, err := strconv.Atoi(stringResult[i])
+		check(err)
+		result[i] = v
+	}
+	return result
+}
+
+func sliceSum(s []int) int {
+	sum := 0
+	for _, v := range s {
+		sum += v
+	}
+	return sum
+}
+
+func fetchLines(day int) []string {
+	input := fetchInput(day)
+	lines := strings.Split(input, "\n")
+
+	if lines[len(lines)-1] != "" {
+		panic("last line of input data was not empty as expected")
+	}
+
+	return lines[0 : len(lines)-1]
 }
 
 func fetchInput(day int) string {
