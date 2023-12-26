@@ -11,6 +11,22 @@ import (
 	"strings"
 )
 
+func compareInt(a, b int) int {
+	if a < b {
+		return -1
+	}
+	if a > b {
+		return +1
+	}
+	return 0
+}
+
+func assert(condition bool, message string) {
+	if !condition {
+		panic(message)
+	}
+}
+
 func check(err error) {
 	if err != nil {
 		panic(err)
