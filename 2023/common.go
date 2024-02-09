@@ -11,6 +11,44 @@ import (
 	"strings"
 )
 
+// https://github.com/CicadaCinema/six-small-algorithms-go/blob/d705e655f18044650dd906dab50a1703bf469d96/5/gcd_lcm.go#L8-L45
+func gcd(a, b int) int {
+	if a == 0 {
+		return b
+	}
+	if b == 0 {
+		return a
+	}
+
+	if a == b {
+		return a
+	}
+
+	if a < 0 {
+		a *= -1
+	}
+	if b < 0 {
+		b *= -1
+	}
+
+	var A, B int
+	if a > b {
+		A = a
+		B = b
+	} else {
+		A = b
+		B = a
+	}
+
+	R := A % B
+
+	return gcd(B, R)
+}
+
+func lcm(a, b int) int {
+	return (a / gcd(a, b)) * b
+}
+
 func compareInt(a, b int) int {
 	if a < b {
 		return -1
