@@ -157,8 +157,16 @@ func main() {
 		}
 	}
 
-	// process queue, filling it up 1000 times
-	for i := 0; i < 1000000000; i++ {
+	// zp is the only input of rx
+	inputToPeriod := make(map[string]int)
+	for k, v := range conjunctions {
+		if slices.Contains(v.destinations, "zp") {
+			inputToPeriod[k] = -1
+		}
+	}
+	mapEntriesToPopulate := len(inputToPeriod)
+
+	for i := 1; i < 100000000000; i++ {
 		assert(len(pulseQueue) == 0, "queue not empty")
 		for _, p := range starter {
 			pulseQueue = append(pulseQueue, p)
@@ -177,6 +185,11 @@ func main() {
 				// when a pulse is received, the conjunction module first updates its memory for that input
 				conjunction.latestPulseReceivedFromInput[thisPulse.input] = thisPulse.bit
 				conjunction.pulse(thisPulse.bit)
+
+				if inputToPeriod[thisPulse.destination] == -1 && !thisPulse.bit {
+					inputToPeriod[thisPulse.destination] = i
+					mapEntriesToPopulate--
+				}
 			} else {
 				if thisPulse.bit {
 					highPulses++
@@ -185,46 +198,20 @@ func main() {
 				}
 			}
 		}
-
-		// print the current state of the machine
-		result := ""
-		for _, flipflopName := range names1 {
-			if i == 0 {
-				fmt.Printf("%s,", flipflopName)
-			}
-			if flipflops[flipflopName].state {
-				result += "1,"
-			} else {
-				result += "0,"
-			}
+		if i == 1000 {
+			fmt.Println(lowPulses * highPulses)
 		}
-		for _, conjunctionName := range names2 {
-			for _, name := range names3 {
-				inputState, exists := conjunctions[conjunctionName].latestPulseReceivedFromInput[name]
-				if exists {
-					if i == 0 {
-						fmt.Printf("%s-%s,", conjunctionName, name)
-					}
-					if inputState {
-						if conjunctionName == "zp" {
-							panic(i)
-						}
-						result += "1,"
-					} else {
-						result += "0,"
-					}
-				}
-			}
-		}
-		if i == 0 {
-			fmt.Printf("\n")
-		}
-		if i%1024 == -1 {
-			fmt.Println(result)
+		if mapEntriesToPopulate == 0 && i > 1000 {
+			break
 		}
 	}
 
-	fmt.Println(lowPulses * highPulses)
+	bigPeriod := 1
+	for _, v := range inputToPeriod {
+		bigPeriod = lcm(bigPeriod, v)
+	}
+
+	fmt.Println(bigPeriod)
 
 	////////////////////////////////////////////////
 
